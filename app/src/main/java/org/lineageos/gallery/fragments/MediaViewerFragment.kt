@@ -30,7 +30,8 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.navigation.fragment.findNavController
 import org.lineageos.gallery.R
-import org.lineageos.gallery.ext.*
+import org.lineageos.gallery.ext.getParcelable
+import org.lineageos.gallery.ext.getViewProperty
 import org.lineageos.gallery.models.Album
 import org.lineageos.gallery.models.Media
 import org.lineageos.gallery.models.MediaType
@@ -154,7 +155,7 @@ class MediaViewerFragment : Fragment(
                             + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO
                             + ")"
                             + (album?.let {
-                        (" AND " + MediaStore.Files.FileColumns.BUCKET_ID + " = " + it.id)
+                        (" AND " + MediaStore.Files.FileColumns.BUCKET_ID + " = ?")
                     } ?: "")
                     )
             CursorLoader(
@@ -162,7 +163,7 @@ class MediaViewerFragment : Fragment(
                 MediaStore.Files.getContentUri("external"),
                 projection,
                 selection,
-                null,
+                album?.let { arrayOf(it.id.toString()) },
                 MediaStore.Files.FileColumns.DATE_ADDED + " DESC"
             )
         }
