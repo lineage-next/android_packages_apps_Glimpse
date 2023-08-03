@@ -8,6 +8,10 @@ package org.lineageos.glimpse.ext
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
+import org.lineageos.glimpse.fragments.InfiniteMediaViewerFragment
+import org.lineageos.glimpse.models.Album
+import org.lineageos.glimpse.models.Media
+import org.lineageos.glimpse.utils.CommonNavigationArguments
 import kotlin.reflect.KClass
 
 fun <T : Parcelable> Bundle.getParcelable(key: String?, clazz: KClass<T>) =

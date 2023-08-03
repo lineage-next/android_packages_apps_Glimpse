@@ -15,8 +15,8 @@
         tools:layout="@layout/fragment_main">
 
         <action
-            android:id="@+id/action_mainFragment_to_mediaViewerFragment"
-            app:destination="@id/mediaViewerFragment"
+            android:id="@+id/action_mainFragment_to_infiniteMediaViewerFragment"
+            app:destination="@id/infiniteMediaViewerFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -32,9 +32,9 @@
     </fragment>
 
     <fragment
-        android:id="@+id/mediaViewerFragment"
-        android:name="org.lineageos.glimpse.fragments.MediaViewerFragment"
-        tools:layout="@layout/fragment_media_viewer" />
+        android:id="@+id/infiniteMediaViewerFragment"
+        android:name="org.lineageos.glimpse.fragments.InfiniteMediaViewerFragment"
+        tools:layout="@layout/media_view" />
 
     <fragment
         android:id="@+id/albumFragment"
@@ -43,7 +43,7 @@
 
         <action
             android:id="@+id/action_albumFragment_to_mediaViewerFragment"
-            app:destination="@id/mediaViewerFragment"
+            app:destination="@id/infiniteMediaViewerFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"

@@ -23,6 +23,7 @@ import androidx.loader.content.Loader
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import org.lineageos.glimpse.R
+import org.lineageos.glimpse.ext.createNavigationBundle
 import org.lineageos.glimpse.ext.getViewProperty
 import org.lineageos.glimpse.thumbnail.ThumbnailAdapter
 import org.lineageos.glimpse.thumbnail.ThumbnailLayoutManager
@@ -66,8 +67,8 @@ class ReelsFragment : Fragment(R.layout.fragment_reels), LoaderManager.LoaderCal
     private val thumbnailAdapter by lazy {
         ThumbnailAdapter { media, position ->
             parentNavController.navigate(
-                R.id.action_mainFragment_to_mediaViewerFragment,
-                MediaViewerFragment.createBundle(
+                R.id.action_mainFragment_to_infiniteMediaViewerFragment,
+                createNavigationBundle(
                     null, media, position
                 )
             )
