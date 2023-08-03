@@ -138,7 +138,7 @@ class MediaViewerFragment : Fragment(R.layout.fragment_media_viewer),
 
     override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
         mediaViewerAdapter.changeCursor(data)
-        infiniteViewPager.currentItem = position
+        infiniteViewPager.setCurrentItem(position, false)
     }
 
     private fun initCursorLoader() {
