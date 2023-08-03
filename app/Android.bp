@@ -25,6 +25,7 @@ android_app {
         "Gallery_androidx.navigation_navigation-fragment-ktx",
         "Gallery_androidx.navigation_navigation-ui-ktx",
         "Gallery_io.coil-kt_coil",
+        "Gallery_io.coil-kt_coil-gif",
         "Gallery_io.coil-kt_coil-video",
     ],
 
