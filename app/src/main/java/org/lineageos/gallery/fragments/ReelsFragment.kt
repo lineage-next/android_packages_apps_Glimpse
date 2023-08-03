@@ -71,7 +71,7 @@ class ReelsFragment : Fragment(R.layout.fragment_reels), LoaderManager.LoaderCal
                     null, media, position
                 )
             )
-        }
+        }.apply { setHasStableIds(true) }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

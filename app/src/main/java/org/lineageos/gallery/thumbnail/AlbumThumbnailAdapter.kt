@@ -33,6 +33,8 @@ class AlbumThumbnailAdapter(
 
     override fun getItemCount() = albums?.size ?: 0
 
+    override fun getItemId(position: Int) = (albums?.let { it[position].id } ?: 0).toLong()
+
     override fun onBindViewHolder(holder: AlbumViewHolder, position: Int) {
         albums?.let {
             holder.bind(it[position])

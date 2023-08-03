@@ -47,7 +47,11 @@ class AlbumsFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
 
     // MediaStore
     private val loaderManagerInstance by lazy { LoaderManager.getInstance(this) }
-    private val albumThumbnailAdapter by lazy { AlbumThumbnailAdapter(parentNavController) }
+    private val albumThumbnailAdapter by lazy {
+        AlbumThumbnailAdapter(parentNavController).apply {
+            setHasStableIds(true)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

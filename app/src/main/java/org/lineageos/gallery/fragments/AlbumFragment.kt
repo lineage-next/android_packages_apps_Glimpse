@@ -75,7 +75,7 @@ class AlbumFragment : Fragment(R.layout.fragment_album), LoaderManager.LoaderCal
                     album, media, position
                 )
             )
-        }
+        }.apply { setHasStableIds(true) }
     }
 
     // Arguments
