@@ -43,9 +43,14 @@ class MediaViewerAdapter(
         getMediaFromMediaStore(position)?.let { holder.bind(it, exoPlayer) }
     }
 
+    override fun onViewDetachedFromWindow(holder: MediaViewHolder) {
+        super.onViewDetachedFromWindow(holder)
+        holder.stopPlayer()
+    }
+
     override fun onViewAttachedToWindow(holder: MediaViewHolder) {
-        holder.prepareExoPlayer()
         super.onViewAttachedToWindow(holder)
+        holder.preparePlayer()
     }
 
     private fun getIdFromMediaStore(position: Int): Long {
@@ -97,7 +102,7 @@ class MediaViewerAdapter(
                 }
 
                 MediaType.VIDEO -> {
-                    playerView.player = exoPlayer
+                    exoPlayer.setMediaItem(MediaItem.fromUri(media.externalContentUri))
                 }
             }
 
@@ -108,12 +113,21 @@ class MediaViewerAdapter(
             playerView.isVisible = media.mediaType == MediaType.VIDEO
         }
 
-        fun prepareExoPlayer() {
-            exoPlayer.stop()
+        fun preparePlayer() {
             if (media.mediaType == MediaType.VIDEO) {
-                exoPlayer.setMediaItem(MediaItem.fromUri(media.externalContentUri))
+                playerView.player = exoPlayer
                 exoPlayer.seekTo(C.TIME_UNSET)
                 exoPlayer.prepare()
+                exoPlayer.playWhenReady = true
+            }
+        }
+
+        fun stopPlayer() {
+            if (media.mediaType == MediaType.VIDEO) {
+                playerView.player = null
+            }
+            if (exoPlayer.isPlaying && media.mediaType == MediaType.VIDEO) {
+                exoPlayer.stop()
             }
         }
 

@@ -45,7 +45,6 @@ class MediaViewerFragment : Fragment(R.layout.fragment_media_viewer),
     // ExoPlayer
     private val exoPlayer by lazy {
         ExoPlayer.Builder(requireContext()).build().apply {
-            playWhenReady = true
             repeatMode = ExoPlayer.REPEAT_MODE_ONE
         }
     }
@@ -88,6 +87,12 @@ class MediaViewerFragment : Fragment(R.layout.fragment_media_viewer),
         infiniteViewPager.adapter = mediaViewerAdapter
 
         initCursorLoader()
+    }
+
+    override fun onDestroyView() {
+        exoPlayer.stop()
+        exoPlayer.release()
+        super.onDestroyView()
     }
 
     override fun onCreateLoader(id: Int, args: Bundle?) = when (id) {
