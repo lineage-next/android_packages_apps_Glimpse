@@ -40,9 +40,12 @@ class MediaViewerAdapter(
     )
 
     override fun onBindViewHolder(holder: MediaViewHolder, position: Int) {
-        getMediaFromMediaStore(position)?.let {
-            holder.bind(it, exoPlayer)
-        }
+        getMediaFromMediaStore(position)?.let { holder.bind(it, exoPlayer) }
+    }
+
+    override fun onViewAttachedToWindow(holder: MediaViewHolder) {
+        holder.prepareExoPlayer()
+        super.onViewAttachedToWindow(holder)
     }
 
     private fun getIdFromMediaStore(position: Int): Long {
@@ -81,8 +84,12 @@ class MediaViewerAdapter(
         private val shareButton = view.findViewById<ImageButton>(R.id.shareButton)
         private val timeTextView = view.findViewById<TextView>(R.id.timeTextView)
 
+        private lateinit var media: Media
+        private lateinit var exoPlayer: ExoPlayer
+
         fun bind(media: Media, exoPlayer: ExoPlayer) {
-            playerView.player = exoPlayer
+            this.media = media
+            this.exoPlayer = exoPlayer
 
             when (media.mediaType) {
                 MediaType.IMAGE -> {
@@ -90,11 +97,7 @@ class MediaViewerAdapter(
                 }
 
                 MediaType.VIDEO -> {
-                    with(exoPlayer) {
-                        setMediaItem(MediaItem.fromUri(media.externalContentUri))
-                        seekTo(C.TIME_UNSET)
-                        prepare()
-                    }
+                    playerView.player = exoPlayer
                 }
             }
 
@@ -103,6 +106,15 @@ class MediaViewerAdapter(
 
             imageView.isVisible = media.mediaType == MediaType.IMAGE
             playerView.isVisible = media.mediaType == MediaType.VIDEO
+        }
+
+        fun prepareExoPlayer() {
+            exoPlayer.stop()
+            if (media.mediaType == MediaType.VIDEO) {
+                exoPlayer.setMediaItem(MediaItem.fromUri(media.externalContentUri))
+                exoPlayer.seekTo(C.TIME_UNSET)
+                exoPlayer.prepare()
+            }
         }
 
         companion object {
