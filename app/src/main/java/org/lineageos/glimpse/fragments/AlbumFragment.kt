@@ -28,6 +28,7 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.shape.MaterialShapeDrawable
 import org.lineageos.glimpse.R
+import org.lineageos.glimpse.ext.createNavigationBundle
 import org.lineageos.glimpse.ext.getParcelable
 import org.lineageos.glimpse.ext.getViewProperty
 import org.lineageos.glimpse.models.Album
@@ -71,7 +72,7 @@ class AlbumFragment : Fragment(R.layout.fragment_album), LoaderManager.LoaderCal
         ThumbnailAdapter { media, position ->
             findNavController().navigate(
                 R.id.action_albumFragment_to_mediaViewerFragment,
-                MediaViewerFragment.createBundle(
+                createNavigationBundle(
                     album, media, position
                 )
             )
