@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
+import androidx.media3.common.C.TIME_UNSET
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
@@ -63,7 +64,14 @@ class MediaViewerFragment : Fragment(
     private val topSheetConstraintLayout by getViewProperty<ConstraintLayout>(R.id.topSheetConstraintLayout)
 
     // ExoPlayer
-    private var exoPlayer: ExoPlayer? = null
+    private val exoPlayer by lazy {
+        ExoPlayer.Builder(requireContext()).build().also {
+            playerView.player = it
+        }.apply {
+            playWhenReady = true
+            repeatMode = ExoPlayer.REPEAT_MODE_ONE
+        }
+    }
 
     // Permissions
     private val permissionsUtils by lazy { PermissionsUtils(requireContext()) }
@@ -135,8 +143,9 @@ class MediaViewerFragment : Fragment(
     override fun onDestroyView() {
         super.onDestroyView()
 
-        exoPlayer?.release()
-        exoPlayer = null
+        playerView.player = null
+        exoPlayer.stop()
+        exoPlayer.release()
     }
 
     override fun onCreateLoader(id: Int, args: Bundle?) = when (id) {
@@ -225,17 +234,11 @@ class MediaViewerFragment : Fragment(
                 }
 
                 MediaType.VIDEO -> {
-                    exoPlayer = ExoPlayer.Builder(requireContext())
-                        .build()
-                        .also {
-                            playerView.player = it
-
-                            it.setMediaItem(MediaItem.fromUri(media.externalContentUri))
-
-                            it.playWhenReady = true
-                            it.seekTo(0)
-                            it.prepare()
-                        }
+                    with(exoPlayer) {
+                        setMediaItem(MediaItem.fromUri(media.externalContentUri))
+                        seekTo(TIME_UNSET)
+                        prepare()
+                    }
                 }
             }
 
