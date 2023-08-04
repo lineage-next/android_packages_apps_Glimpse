@@ -23,6 +23,9 @@ import androidx.fragment.app.Fragment
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
@@ -30,6 +33,7 @@ import org.lineageos.glimpse.R
 import org.lineageos.glimpse.ext.*
 import org.lineageos.glimpse.models.Album
 import org.lineageos.glimpse.models.Media
+import org.lineageos.glimpse.models.MediaType
 import org.lineageos.glimpse.thumbnail.MediaViewerAdapter
 import org.lineageos.glimpse.utils.CommonNavigationArguments
 import org.lineageos.glimpse.utils.MediaStoreRequests
@@ -73,8 +77,15 @@ class MediaViewerFragment : Fragment(
         }
     }
 
+    // Player
+    private val exoPlayer by lazy {
+        ExoPlayer.Builder(requireContext()).build().apply {
+            repeatMode = ExoPlayer.REPEAT_MODE_ONE
+        }
+    }
+
     // Adapter
-    private val mediaViewerAdapter by lazy { MediaViewerAdapter() }
+    private val mediaViewerAdapter by lazy { MediaViewerAdapter(exoPlayer) }
 
     // MediaStore
     private val loaderManagerInstance by lazy { LoaderManager.getInstance(this) }
@@ -91,6 +102,15 @@ class MediaViewerFragment : Fragment(
 
             dateTextView.text = dateFormatter.format(media.dateAdded)
             timeTextView.text = timeFormatter.format(media.dateAdded)
+
+            if (media.mediaType == MediaType.VIDEO) {
+                exoPlayer.setMediaItem(MediaItem.fromUri(media.externalContentUri))
+                exoPlayer.seekTo(C.TIME_UNSET)
+                exoPlayer.prepare()
+                exoPlayer.playWhenReady = true
+            } else {
+                exoPlayer.stop()
+            }
         }
     }
 
@@ -130,6 +150,9 @@ class MediaViewerFragment : Fragment(
 
     override fun onDestroyView() {
         viewPager.unregisterOnPageChangeCallback(onPageChangeCallback)
+
+        exoPlayer.stop()
+        exoPlayer.release()
 
         super.onDestroyView()
     }

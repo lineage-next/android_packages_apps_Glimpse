@@ -11,8 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.isVisible
-import androidx.media3.common.C
-import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.recyclerview.widget.RecyclerView
@@ -22,7 +20,9 @@ import org.lineageos.glimpse.models.Media
 import org.lineageos.glimpse.models.MediaType
 import java.util.Date
 
-class MediaViewerAdapter : BaseCursorAdapter<MediaViewerAdapter.MediaViewHolder>() {
+class MediaViewerAdapter(
+    private val exoPlayer: ExoPlayer
+) : BaseCursorAdapter<MediaViewerAdapter.MediaViewHolder>() {
     init {
         setHasStableIds(true)
     }
@@ -34,17 +34,17 @@ class MediaViewerAdapter : BaseCursorAdapter<MediaViewerAdapter.MediaViewHolder>
     )
 
     override fun onBindViewHolder(holder: MediaViewHolder, position: Int) {
-        getMediaFromMediaStore(position)?.let { holder.bind(it) }
-    }
-
-    override fun onViewDetachedFromWindow(holder: MediaViewHolder) {
-        super.onViewDetachedFromWindow(holder)
-        holder.stopPlayer()
+        getMediaFromMediaStore(position)?.let { holder.bind(it, exoPlayer) }
     }
 
     override fun onViewAttachedToWindow(holder: MediaViewHolder) {
         super.onViewAttachedToWindow(holder)
-        holder.preparePlayer()
+        holder.attachPlayer()
+    }
+
+    override fun onViewDetachedFromWindow(holder: MediaViewHolder) {
+        super.onViewDetachedFromWindow(holder)
+        holder.detachPlayer()
     }
 
     fun getMediaFromMediaStore(position: Int): Media? {
@@ -78,44 +78,33 @@ class MediaViewerAdapter : BaseCursorAdapter<MediaViewerAdapter.MediaViewHolder>
         private val playerView = view.findViewById<PlayerView>(R.id.playerView)
 
         private lateinit var media: Media
-        private val exoPlayer by lazy {
-            ExoPlayer.Builder(view.context).build().apply {
-                repeatMode = ExoPlayer.REPEAT_MODE_ONE
-            }
-        }
+        private lateinit var exoPlayer: ExoPlayer
 
-        fun bind(media: Media) {
+        fun bind(media: Media, exoPlayer: ExoPlayer) {
             this.media = media
+            this.exoPlayer = exoPlayer
 
             when (media.mediaType) {
                 MediaType.IMAGE -> {
                     imageView.load(media.externalContentUri)
                 }
 
-                MediaType.VIDEO -> {
-                    exoPlayer.setMediaItem(MediaItem.fromUri(media.externalContentUri))
-                }
+                MediaType.VIDEO -> {}
             }
 
             imageView.isVisible = media.mediaType == MediaType.IMAGE
             playerView.isVisible = media.mediaType == MediaType.VIDEO
         }
 
-        fun preparePlayer() {
+        fun attachPlayer() {
             if (media.mediaType == MediaType.VIDEO) {
                 playerView.player = exoPlayer
-                exoPlayer.seekTo(C.TIME_UNSET)
-                exoPlayer.prepare()
-                exoPlayer.playWhenReady = true
             }
         }
 
-        fun stopPlayer() {
+        fun detachPlayer() {
             if (media.mediaType == MediaType.VIDEO) {
                 playerView.player = null
-            }
-            if (exoPlayer.isPlaying && media.mediaType == MediaType.VIDEO) {
-                exoPlayer.stop()
             }
         }
     }
