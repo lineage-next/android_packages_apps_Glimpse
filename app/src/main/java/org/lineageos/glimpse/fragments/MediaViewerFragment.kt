@@ -87,8 +87,10 @@ class MediaViewerFragment : Fragment(
     }
 
     // Adapter
+    private val mediaViewHolderDataLiveData =
+        MutableLiveData<MediaViewerAdapter.MediaViewHolderData>()
     private val mediaViewerAdapter by lazy {
-        MediaViewerAdapter(exoPlayer, currentPositionLiveData)
+        MediaViewerAdapter(exoPlayer, currentPositionLiveData, mediaViewHolderDataLiveData)
     }
 
     // MediaStore
@@ -126,21 +128,18 @@ class MediaViewerFragment : Fragment(
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
 
+            val media = mediaViewerAdapter.getMediaFromMediaStore(position) ?: return
             this@MediaViewerFragment.position = position
+            mediaViewHolderDataLiveData.postValue(
+                MediaViewerAdapter.MediaViewHolderData(media, position)
+            )
 
             if (mediaViewerAdapter.itemCount <= 0) {
                 // No medias, bail out
                 // TODO: Do better once we support showing a specific album
                 //       from intents (dialog and such)
                 findNavController().popBackStack()
-                return
             }
-
-            val media = mediaViewerAdapter.getMediaFromMediaStore(position) ?: return
-
-            dateTextView.text = dateFormatter.format(media.dateAdded)
-            timeTextView.text = timeFormatter.format(media.dateAdded)
-            favoriteButton.isSelected = media.isFavorite
         }
     }
 
@@ -173,8 +172,6 @@ class MediaViewerFragment : Fragment(
 
         favoriteButton.setOnClickListener {
             mediaViewerAdapter.getMediaFromMediaStore(viewPager.currentItem)?.let {
-                favoriteButton.isSelected = !it.isFavorite
-
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     noopContract.launch(
                         requireContext().contentResolver.createFavoriteRequest(
@@ -184,6 +181,14 @@ class MediaViewerFragment : Fragment(
                 } else {
                     it.favorite(requireContext().contentResolver, !it.isFavorite)
                 }
+            }
+        }
+
+        mediaViewHolderDataLiveData.observe(viewLifecycleOwner) {
+            if (position == it.position) {
+                favoriteButton.isSelected = it.media.isFavorite
+                dateTextView.text = dateFormatter.format(it.media.dateAdded)
+                timeTextView.text = timeFormatter.format(it.media.dateAdded)
             }
         }
 

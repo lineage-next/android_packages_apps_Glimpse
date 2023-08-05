@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -27,6 +28,7 @@ import java.util.Date
 class MediaViewerAdapter(
     private val exoPlayer: ExoPlayer,
     private val currentPositionLiveData: LiveData<Int>,
+    private val mediaLiveData: MutableLiveData<MediaViewHolderData>,
 ) : BaseCursorAdapter<MediaViewerAdapter.MediaViewHolder>() {
     init {
         setHasStableIds(true)
@@ -40,7 +42,10 @@ class MediaViewerAdapter(
     )
 
     override fun onBindViewHolder(holder: MediaViewHolder, position: Int) {
-        getMediaFromMediaStore(position)?.let { holder.bind(it, position) }
+        getMediaFromMediaStore(position)?.let {
+            holder.bind(it, position)
+            mediaLiveData.postValue(MediaViewHolderData(it, position))
+        }
     }
 
     override fun onViewAttachedToWindow(holder: MediaViewHolder) {
@@ -130,4 +135,6 @@ class MediaViewerAdapter(
             currentPositionLiveData.removeObserver(observer)
         }
     }
+
+    data class MediaViewHolderData(val media: Media, val position: Int)
 }
