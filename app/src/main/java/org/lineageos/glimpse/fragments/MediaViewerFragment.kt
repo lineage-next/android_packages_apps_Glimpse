@@ -24,6 +24,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
@@ -32,6 +33,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.lineageos.glimpse.R
 import org.lineageos.glimpse.ext.*
 import org.lineageos.glimpse.models.Album
@@ -119,6 +122,13 @@ class MediaViewerFragment : Fragment(
                 Snackbar.LENGTH_LONG,
             ).show()
         }
+    private val favoriteUriContract =
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
+            lifecycleScope.launch {
+                delay(150) // fixme
+                reload()
+            }
+        }
 
     private val onPageChangeCallback = object : OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
@@ -172,6 +182,21 @@ class MediaViewerFragment : Fragment(
                     )
                 } else {
                     it.delete(requireContext().contentResolver)
+                }
+            }
+        }
+
+        favoriteButton.setOnClickListener {
+            mediaViewerAdapter.getMediaFromMediaStore(viewPager.currentItem)?.let {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    favoriteUriContract.launch(
+                        requireContext().contentResolver.createFavoriteRequest(
+                            !it.isFavorite, it.externalContentUri
+                        )
+                    )
+                } else {
+                    it.favorite(requireContext().contentResolver, !it.isFavorite)
+                    reload()
                 }
             }
         }
@@ -286,6 +311,10 @@ class MediaViewerFragment : Fragment(
         loaderManagerInstance.initLoader(
             MediaStoreRequests.MEDIA_STORE_REELS_LOADER_ID.ordinal, null, this
         )
+    }
+
+    private fun reload() {
+        onPageChangeCallback.onPageSelected(this@MediaViewerFragment.position)
     }
 
     companion object {
