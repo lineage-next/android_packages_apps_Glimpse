@@ -29,11 +29,7 @@ class ThumbnailLayoutManager(
         private val adapter: ThumbnailAdapter,
         private val spanCount: Int,
     ) : SpanSizeLookup() {
-        override fun getSpanSize(position: Int) = when (adapter.getItemViewType(position)) {
-            ThumbnailAdapter.ViewTypes.ITEM.ordinal -> 1
-            ThumbnailAdapter.ViewTypes.HEADER.ordinal -> spanCount
-            else -> throw Exception("Unknown view type")
-        }
+        override fun getSpanSize(position: Int) = 1
     }
 
     companion object {

@@ -27,6 +27,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import org.lineageos.glimpse.R
 import org.lineageos.glimpse.ext.getViewProperty
+import org.lineageos.glimpse.thumbnail.DataItemDecorator
 import org.lineageos.glimpse.thumbnail.ThumbnailAdapter
 import org.lineageos.glimpse.thumbnail.ThumbnailLayoutManager
 import org.lineageos.glimpse.utils.MediaStoreRequests
@@ -75,6 +76,9 @@ class ReelsFragment : Fragment(R.layout.fragment_reels), LoaderManager.LoaderCal
             )
         }
     }
+    private val dataItemDecorator by lazy {
+        DataItemDecorator()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -82,6 +86,7 @@ class ReelsFragment : Fragment(R.layout.fragment_reels), LoaderManager.LoaderCal
         reelsRecyclerView.layoutManager = ThumbnailLayoutManager(
             requireContext(), thumbnailAdapter
         )
+        reelsRecyclerView.addItemDecoration(dataItemDecorator)
         reelsRecyclerView.adapter = thumbnailAdapter
 
         ViewCompat.setOnApplyWindowInsetsListener(view) { _, windowInsets ->
@@ -154,10 +159,12 @@ class ReelsFragment : Fragment(R.layout.fragment_reels), LoaderManager.LoaderCal
     }
 
     override fun onLoaderReset(loader: Loader<Cursor>) {
+        dataItemDecorator.swapCursor(null)
         thumbnailAdapter.changeCursor(null)
     }
 
     override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
+        dataItemDecorator.swapCursor(data)
         thumbnailAdapter.changeCursor(data)
     }
 
