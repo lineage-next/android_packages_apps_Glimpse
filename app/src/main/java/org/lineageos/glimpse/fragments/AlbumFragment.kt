@@ -34,6 +34,7 @@ import org.lineageos.glimpse.R
 import org.lineageos.glimpse.ext.getParcelable
 import org.lineageos.glimpse.ext.getViewProperty
 import org.lineageos.glimpse.models.Album
+import org.lineageos.glimpse.query.buildQuery
 import org.lineageos.glimpse.thumbnail.ThumbnailAdapter
 import org.lineageos.glimpse.thumbnail.ThumbnailLayoutManager
 import org.lineageos.glimpse.utils.MediaStoreBuckets
@@ -138,44 +139,51 @@ class AlbumFragment : Fragment(R.layout.fragment_album), LoaderManager.LoaderCal
                 MediaStore.Files.FileColumns.DATE_ADDED,
                 MediaStore.Files.FileColumns.MEDIA_TYPE,
             )
-            val selection = buildString {
-                append("(")
-                append(buildString {
-                    append(MediaStore.Files.FileColumns.MEDIA_TYPE)
-                    append("=")
-                    append(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
-                    append(" OR ")
-                    append(MediaStore.Files.FileColumns.MEDIA_TYPE)
-                    append("=")
-                    append(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)
-                })
-                append(")")
+            val imageOrVideo = buildQuery {
+                or(
+                    eq(
+                        MediaStore.Files.FileColumns.MEDIA_TYPE,
+                        MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
+                    ),
+                    eq(
+                        MediaStore.Files.FileColumns.MEDIA_TYPE,
+                        MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO
+                    ),
+                )
+            }
 
+            val albumKind = buildQuery {
                 when (album.id) {
                     MediaStoreBuckets.MEDIA_STORE_BUCKET_FAVORITES.id -> {
-                        append(" AND ")
-                        append(MediaStore.Files.FileColumns.IS_FAVORITE)
-                        append(" = 1")
+                        eq(MediaStore.Files.FileColumns.IS_FAVORITE, 1)
                     }
+
                     MediaStoreBuckets.MEDIA_STORE_BUCKET_TRASH.id -> {
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-                            append(" AND ")
-                            append(MediaStore.Files.FileColumns.IS_TRASHED)
-                            append(" = 1")
+                            eq(MediaStore.Files.FileColumns.IS_TRASHED, 1)
                         }
                     }
+
                     else -> {
-                        append(" AND ")
-                        append(MediaStore.Files.FileColumns.BUCKET_ID)
-                        append(" = ?")
+                        eq(MediaStore.Files.FileColumns.BUCKET_ID, "?")
                     }
                 }
             }
+
+            val selection = if (albumKind.valid()) {
+                buildQuery {
+                    and(imageOrVideo, albumKind)
+                }
+            } else {
+                imageOrVideo
+            }
+
+
             GlimpseCursorLoader(
                 requireContext(),
                 MediaStore.Files.getContentUri("external"),
                 projection,
-                selection,
+                selection.build(),
                 album.takeIf {
                     MediaStoreBuckets.values().none { bucket -> it.id == bucket.id }
                 }?.let { arrayOf(it.id.toString()) },
