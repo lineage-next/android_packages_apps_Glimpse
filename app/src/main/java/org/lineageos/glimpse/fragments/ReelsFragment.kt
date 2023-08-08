@@ -5,9 +5,11 @@
 
 package org.lineageos.glimpse.fragments
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.database.Cursor
 import android.os.Build
+import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
@@ -27,6 +29,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import org.lineageos.glimpse.R
 import org.lineageos.glimpse.ext.getViewProperty
+import org.lineageos.glimpse.ext.requestManagedMedia
 import org.lineageos.glimpse.query.*
 import org.lineageos.glimpse.thumbnail.ThumbnailAdapter
 import org.lineageos.glimpse.thumbnail.ThumbnailLayoutManager
@@ -63,6 +66,10 @@ class ReelsFragment : Fragment(R.layout.fragment_reels), LoaderManager.LoaderCal
             }
         }
     }
+    private val initContract =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            initCursorLoader()
+        }
 
     // MediaStore
     private val loaderManagerInstance by lazy { LoaderManager.getInstance(this) }
@@ -97,7 +104,10 @@ class ReelsFragment : Fragment(R.layout.fragment_reels), LoaderManager.LoaderCal
             windowInsets
         }
 
-        if (!permissionsUtils.mainPermissionsGranted()) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.S && !MediaStore.canManageMedia(requireContext())) {
+            val intent = Intent().requestManagedMedia(requireContext().packageName)
+            initContract.launch(intent)
+        } else if (!permissionsUtils.mainPermissionsGranted()) {
             mainPermissionsRequestLauncher.launch(PermissionsUtils.mainPermissions)
         } else {
             initCursorLoader()
