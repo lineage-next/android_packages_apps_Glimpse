@@ -19,6 +19,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
@@ -71,10 +72,15 @@ class AlbumFragment : Fragment(R.layout.fragment_album) {
 
     // MediaStore
     private val thumbnailAdapter by lazy {
-        ThumbnailAdapter(album.id != MediaStoreBuckets.MEDIA_STORE_BUCKET_TRASH.id) { media ->
+        ThumbnailAdapter(album.id != MediaStoreBuckets.MEDIA_STORE_BUCKET_TRASH.id) { media, anchor ->
+            val extras = FragmentNavigatorExtras(
+                anchor to "${media.id}"
+            )
             findNavController().navigate(
                 R.id.action_albumFragment_to_mediaViewerFragment,
-                MediaViewerFragment.createBundle(media, album.id)
+                MediaViewerFragment.createBundle(media, album.id),
+                null,
+                extras
             )
         }
     }

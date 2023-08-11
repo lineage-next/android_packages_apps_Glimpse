@@ -32,11 +32,13 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.fragment.findNavController
+import androidx.transition.TransitionInflater
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import org.lineageos.glimpse.R
 import org.lineageos.glimpse.ext.*
@@ -92,6 +94,14 @@ class MediaViewerFragment : Fragment(R.layout.fragment_media_viewer) {
 
                 initData(medias.toSet().sortedByDescending { it.dateAdded })
             } ?: albumId?.also {
+                // We need a sample as soon as possible to complete the transition
+                mediaViewModel.media.take(1).collectLatest {
+                    when (it) {
+                        is Data -> initData(it.values)
+                        is Empty -> Unit
+                    }
+                }
+                // After that we can collect updates when the device is resumed
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     mediaViewModel.media.collectLatest {
                         when (it) {
@@ -130,8 +140,13 @@ class MediaViewerFragment : Fragment(R.layout.fragment_media_viewer) {
         }
 
     // Adapter
+    private val startPostponedEnterTransitionUnit = { startPostponedEnterTransition() }
     private val mediaViewerAdapter by lazy {
-        MediaViewerAdapter(exoPlayerLazy, mediaViewModel)
+        MediaViewerAdapter(
+            exoPlayerLazy,
+            mediaViewModel,
+            startPostponedEnterTransitionUnit
+        )
     }
 
     // Arguments
@@ -268,6 +283,18 @@ class MediaViewerFragment : Fragment(R.layout.fragment_media_viewer) {
 
     private val mediaInfoBottomSheetDialogCallbacks =
         MediaInfoBottomSheetDialog.Callbacks(this)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        postponeEnterTransition()
+        with(TransitionInflater.from(requireContext())) {
+            sharedElementEnterTransition =
+                inflateTransition(R.transition.image_shared_element_transition)
+            sharedElementReturnTransition = null
+            enterTransition = inflateTransition(R.transition.image_viewer_enter_transition)
+            returnTransition = null
+        }
+    }
 
     override fun onResume() {
         super.onResume()

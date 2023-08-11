@@ -18,6 +18,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
@@ -73,10 +74,15 @@ class ReelsFragment : Fragment(R.layout.fragment_reels) {
 
     // MediaStore
     private val thumbnailAdapter by lazy {
-        ThumbnailAdapter { media ->
+        ThumbnailAdapter { media, anchor ->
+            val extras = FragmentNavigatorExtras(
+                anchor to "${media.id}"
+            )
             parentNavController.navigate(
                 R.id.action_mainFragment_to_mediaViewerFragment,
-                MediaViewerFragment.createBundle(media, MediaStoreBuckets.MEDIA_STORE_BUCKET_REELS.id)
+                MediaViewerFragment.createBundle(media, MediaStoreBuckets.MEDIA_STORE_BUCKET_REELS.id),
+                null,
+                extras
             )
         }
     }

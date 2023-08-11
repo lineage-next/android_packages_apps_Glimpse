@@ -23,7 +23,7 @@ import java.util.Date
 
 class ThumbnailAdapter(
     private val allowHeaders: Boolean = true,
-    private val onItemSelected: (media: Media) -> Unit,
+    private val onItemSelected: (media: Media, anchor: View) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val headersPositions = sortedSetOf<Int>()
 
@@ -146,7 +146,7 @@ class ThumbnailAdapter(
 
     class ThumbnailViewHolder(
         view: View,
-        private val onItemSelected: (media: Media) -> Unit,
+        private val onItemSelected: (media: Media, anchor: View) -> Unit,
     ) : RecyclerView.ViewHolder(view) {
         // Views
         private val videoOverlayImageView =
@@ -159,9 +159,10 @@ class ThumbnailAdapter(
             this.media = media
 
             itemView.setOnClickListener {
-                onItemSelected(media)
+                onItemSelected(media, thumbnailImageView)
             }
 
+            thumbnailImageView.transitionName = "${media.id}"
             thumbnailImageView.load(media.externalContentUri) {
                 memoryCacheKey("thumbnail_${media.id}")
                 size(DisplayAwareGridLayoutManager.MAX_THUMBNAIL_SIZE)
