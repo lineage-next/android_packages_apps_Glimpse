@@ -664,3 +664,13 @@ java_library_static {
     ],
     java_version: "1.7",
 }
+
+java_import_host {
+    name: "Glimpse_com.github.bumptech.glide_annotations-host",
+    jars: ["host/com/github/bumptech/glide/annotations/4.15.1/annotations-4.15.1.jar"],
+}
+
+java_import_host {
+    name: "Glimpse_com.github.bumptech.glide_compiler-host",
+    jars: ["host/com/github/bumptech/glide/compiler/4.15.1/compiler-4.15.1.jar"],
+}
