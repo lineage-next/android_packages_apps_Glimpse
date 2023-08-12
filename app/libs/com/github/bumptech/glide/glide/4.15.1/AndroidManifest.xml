@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="coil.gif" >
+    package="com.bumptech.glide" >
 
     <uses-sdk
-        android:minSdkVersion="21"
-        android:targetSdkVersion="33" />
+        android:minSdkVersion="14"
+        android:targetSdkVersion="32" />
+
+    <application />
 
 </manifest>

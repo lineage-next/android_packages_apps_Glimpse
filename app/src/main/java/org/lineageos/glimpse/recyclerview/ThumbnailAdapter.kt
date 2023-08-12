@@ -13,8 +13,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
 import org.lineageos.glimpse.R
+import org.lineageos.glimpse.ext.load
 import org.lineageos.glimpse.models.Media
 import org.lineageos.glimpse.models.MediaType
 import java.time.ZoneId
@@ -162,11 +162,7 @@ class ThumbnailAdapter(
                 onItemSelected(media)
             }
 
-            thumbnailImageView.load(media.externalContentUri) {
-                memoryCacheKey("thumbnail_${media.id}")
-                size(DisplayAwareGridLayoutManager.MAX_THUMBNAIL_SIZE)
-                placeholder(R.drawable.thumbnail_placeholder)
-            }
+            thumbnailImageView.load(media)
             videoOverlayImageView.isVisible = media.mediaType == MediaType.VIDEO
         }
     }

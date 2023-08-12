@@ -12,8 +12,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
 import org.lineageos.glimpse.R
+import org.lineageos.glimpse.ext.load
 import org.lineageos.glimpse.fragments.AlbumFragment
 import org.lineageos.glimpse.models.Album
 
@@ -69,12 +69,7 @@ class AlbumThumbnailAdapter(
                 R.plurals.album_thumbnail_items, album.size, album.size
             )
 
-            thumbnailImageView.load(album.thumbnail.externalContentUri) {
-                memoryCacheKey("thumbnail_${album.thumbnail.id}")
-                size(DisplayAwareGridLayoutManager.MAX_THUMBNAIL_SIZE)
-                placeholder(R.drawable.thumbnail_placeholder)
-            }
-
+            thumbnailImageView.load(album.thumbnail)
             itemView.setOnClickListener {
                 navController.navigate(
                     R.id.action_mainFragment_to_albumFragment,

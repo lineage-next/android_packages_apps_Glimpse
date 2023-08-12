@@ -8,6 +8,7 @@ package org.lineageos.glimpse.models
 import android.content.ContentUris
 import android.os.Parcel
 import android.os.Parcelable
+import com.bumptech.glide.signature.MediaStoreSignature
 import org.lineageos.glimpse.ext.*
 import java.util.Date
 import kotlin.reflect.safeCast
@@ -81,6 +82,8 @@ data class Media(
         dest.writeInt(height)
         dest.writeInt(orientation)
     }
+
+    fun signature() = MediaStoreSignature(mimeType, dateModified.time * 1000, orientation)
 
     companion object CREATOR : Parcelable.Creator<Media> {
         override fun createFromParcel(parcel: Parcel) = Media(parcel)

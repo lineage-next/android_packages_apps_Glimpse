@@ -16,9 +16,8 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerControlView
 import androidx.media3.ui.PlayerView
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
 import org.lineageos.glimpse.R
-import org.lineageos.glimpse.ext.fade
+import org.lineageos.glimpse.ext.*
 import org.lineageos.glimpse.models.Media
 import org.lineageos.glimpse.models.MediaType
 import org.lineageos.glimpse.models.MediaUri
@@ -157,10 +156,7 @@ class MediaViewerAdapter(
         fun bind(media: Media, position: Int) {
             this.media = media
             this.position = position
-            imageView.load(media.externalContentUri) {
-                memoryCacheKey("full_${media.id}")
-                placeholderMemoryCacheKey("thumbnail_${media.id}")
-            }
+            imageView.load(media)
         }
 
         fun bind(mediaUri: MediaUri, position: Int) {
