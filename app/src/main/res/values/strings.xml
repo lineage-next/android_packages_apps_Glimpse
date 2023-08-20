@@ -17,6 +17,8 @@
     <string name="reels_title">Reels</string>
     <string name="albums_title">Albums</string>
     <string name="search_title">Search</string>
+    <string name="locations_title">Locations</string>
+    <string name="categories_title">Categories</string>
 
     <!-- Album buckets -->
     <string name="album_favorites">Favorites</string>
@@ -80,4 +82,13 @@
     <string name="intent_media_not_found">Media not found</string>
     <string name="intent_media_type_not_found">Media type not found</string>
     <string name="intent_media_type_not_supported">Media type not supported</string>
+
+    <!-- Search fragment -->
+    <string name="search_location_view_all_button">View all</string>
+
+    <!-- Search categories -->
+    <string name="search_category_photos">Photos</string>
+    <string name="search_category_videos">Videos</string>
+    <string name="search_category_favorites">Favorites</string>
+    <string name="search_category_trashed">Trashed</string>
 </resources>
