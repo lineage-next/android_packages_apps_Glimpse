@@ -6,6 +6,7 @@
 package org.lineageos.glimpse.ext
 
 import android.view.Window
+import android.view.WindowInsetsController
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 
@@ -18,7 +19,8 @@ fun Window.setBarsVisibility(
     navigationBars: Boolean? = null,
 ) {
     // Configure the behavior of the hidden bars
-    windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+    // TODO: Use WindowInsetsControllerCompat.BEHAVIOR_DEFAULT when it becomes available in AOSP
+    windowInsetsController.systemBarsBehavior = WindowInsetsController.BEHAVIOR_DEFAULT
 
     val systemBarsType = WindowInsetsCompat.Type.systemBars()
     val statusBarsType = WindowInsetsCompat.Type.statusBars()
