@@ -91,21 +91,19 @@ class MediaFlow(private val context: Context, private val bucketId: Int) : Query
             MediaStore.Files.FileColumns.HEIGHT,
             MediaStore.Files.FileColumns.ORIENTATION,
         )
-    ) { it, indexCache ->
-        var i = 0
-
-        val id = it.getLong(indexCache[i++])
-        val bucketId = it.getInt(indexCache[i++])
-        val displayName = it.getString(indexCache[i++])
-        val isFavorite = it.getInt(indexCache[i++])
-        val isTrashed = it.getInt(indexCache[i++])
-        val mediaType = it.getInt(indexCache[i++])
-        val mimeType = it.getString(indexCache[i++])
-        val dateAdded = it.getLong(indexCache[i++])
-        val dateModified = it.getLong(indexCache[i++])
-        val width = it.getInt(indexCache[i++])
-        val height = it.getInt(indexCache[i++])
-        val orientation = it.getInt(indexCache[i++])
+    ) { it, indexCache, indexGenerator ->
+        val id = it.getLong(indexCache[indexGenerator.next()])
+        val bucketId = it.getInt(indexCache[indexGenerator.next()])
+        val displayName = it.getString(indexCache[indexGenerator.next()])
+        val isFavorite = it.getInt(indexCache[indexGenerator.next()])
+        val isTrashed = it.getInt(indexCache[indexGenerator.next()])
+        val mediaType = it.getInt(indexCache[indexGenerator.next()])
+        val mimeType = it.getString(indexCache[indexGenerator.next()])
+        val dateAdded = it.getLong(indexCache[indexGenerator.next()])
+        val dateModified = it.getLong(indexCache[indexGenerator.next()])
+        val width = it.getInt(indexCache[indexGenerator.next()])
+        val height = it.getInt(indexCache[indexGenerator.next()])
+        val orientation = it.getInt(indexCache[indexGenerator.next()])
 
         Media.fromMediaStore(
             id,

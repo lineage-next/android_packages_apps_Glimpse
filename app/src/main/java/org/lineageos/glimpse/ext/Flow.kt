@@ -11,5 +11,5 @@ import kotlinx.coroutines.flow.map
 
 fun <T> Flow<Cursor?>.mapEachRow(
     projection: Array<String>,
-    mapping: (Cursor, Array<Int>) -> T,
+    mapping: (Cursor, Array<Int>, Iterator<Int>) -> T,
 ) = map { it.mapEachRow(projection, mapping) }
